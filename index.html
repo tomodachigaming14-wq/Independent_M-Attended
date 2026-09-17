@@ -82,15 +82,17 @@
         .field-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23475569' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; cursor: pointer; color: #0f172a; min-height: 50px; }
         .field-group select option { background: #ffffff; color: #0f172a; padding: 6px 12px !important; line-height: 1.4 !important; }
 
-        /* ===== DATE LIST CONTAINER ===== */
-        .date-list-container { display: flex; flex-direction: column; gap: 10px; }
-        .date-entry { display: flex; gap: 10px; align-items: center; }
-        .date-entry input[type="date"] { flex: 1; padding: 0.75rem 1.1rem; border: 1.5px solid #cbd5e1; border-radius: 16px; font-size: 0.9rem; transition: all 0.25s ease; outline: none; color: #0f172a; font-family: "Inter", "Segoe UI", Roboto, sans-serif; background: #ffffff; }
-        .date-entry input[type="date"]:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-        .date-entry .btn-remove-date { background: #ef4444; color: white; border: none; border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; flex-shrink: 0; font-size: 0.9rem; }
-        .date-entry .btn-remove-date:hover { background: #dc2626; transform: scale(1.05); }
-        .date-entry .btn-remove-date:active { transform: scale(0.95); }
-        .btn-add-date { background: #10b981; color: white; border: none; border-radius: 12px; padding: 0.6rem 1.2rem; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-family: "Inter", "Segoe UI", Roboto, sans-serif; align-self: flex-start; }
+        /* ===== DATE RANGE CONTAINER ===== */
+        .date-list-container { display: flex; flex-direction: column; gap: 12px; }
+        .date-range-entry { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #f8fafc; padding: 12px 16px; border-radius: 16px; border: 1.5px solid #e2e8f0; }
+        .date-range-entry .range-label { font-size: 0.7rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        .date-range-entry input[type="date"] { flex: 1; min-width: 130px; padding: 0.6rem 0.9rem; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 0.85rem; transition: all 0.25s ease; outline: none; color: #0f172a; font-family: "Inter", "Segoe UI", Roboto, sans-serif; background: #ffffff; }
+        .date-range-entry input[type="date"]:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .date-range-entry .range-separator { font-weight: 700; color: #2563eb; font-size: 1rem; padding: 0 4px; }
+        .date-range-entry .btn-remove-date { background: #ef4444; color: white; border: none; border-radius: 12px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; flex-shrink: 0; font-size: 0.85rem; }
+        .date-range-entry .btn-remove-date:hover { background: #dc2626; transform: scale(1.05); }
+        .date-range-entry .btn-remove-date:active { transform: scale(0.95); }
+        .btn-add-date { background: #10b981; color: white; border: none; border-radius: 12px; padding: 0.7rem 1.4rem; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-family: "Inter", "Segoe UI", Roboto, sans-serif; align-self: flex-start; }
         .btn-add-date:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
         .btn-add-date:active { transform: scale(0.95); }
 
@@ -297,7 +299,11 @@
             .modal-footer { padding: 0.6rem 1rem; flex-direction: column; text-align: center; }
             .modal-overlay { padding: 0.3rem; }
             .toast-container { top: 10px; right: 10px; left: 10px; max-width: 100%; }
-            .date-entry .btn-remove-date { width: 38px; height: 38px; font-size: 0.8rem; }
+            .date-range-entry { flex-direction: column; align-items: stretch; padding: 10px 12px; }
+            .date-range-entry .range-label { text-align: center; }
+            .date-range-entry input[type="date"] { min-width: unset; }
+            .date-range-entry .range-separator { text-align: center; }
+            .date-range-entry .btn-remove-date { width: 100%; height: 36px; }
             .detail-grid { grid-template-columns: 1fr; }
             .detail-modal .modal-body { padding: 1rem; }
             .detail-view-header { margin: -1rem -1rem 1rem -1rem; padding: 1.2rem 1rem; }
@@ -372,7 +378,7 @@
                 <label><i class="fas fa-calendar-alt"></i> Date of Meeting (MM/DD/YYYY) <span class="required">*</span></label>
                 <div class="date-list-container" id="dateListContainer"></div>
                 <button type="button" class="btn-add-date" id="addDateBtn">
-                    <i class="fas fa-plus-circle"></i> Add Another Date
+                    <i class="fas fa-plus-circle"></i> Add Another Date Range
                 </button>
             </div>
 
@@ -693,44 +699,56 @@
     }
 
     // ============================================
-    // DATE ENTRY MANAGEMENT
+    // DATE RANGE ENTRY MANAGEMENT
     // ============================================
     let dateCounter = 0;
 
-    function createDateEntry(value = '') {
+    function createDateRangeEntry(startValue = '', endValue = '') {
         dateCounter++;
         const entry = document.createElement('div');
-        entry.className = 'date-entry';
+        entry.className = 'date-range-entry';
         entry.dataset.dateId = dateCounter;
         entry.innerHTML = `
-            <input type="date" class="date-input" value="${value}" required>
-            <button type="button" class="btn-remove-date" title="Remove this date">
+            <span class="range-label"><i class="fas fa-calendar-alt"></i> From</span>
+            <input type="date" class="date-start" value="${startValue}">
+            <span class="range-separator">→</span>
+            <span class="range-label"><i class="fas fa-calendar-check"></i> To</span>
+            <input type="date" class="date-end" value="${endValue}">
+            <button type="button" class="btn-remove-date" title="Remove this date range">
                 <i class="fas fa-trash"></i>
             </button>
         `;
         entry.querySelector('.btn-remove-date').addEventListener('click', function() {
             const container = document.getElementById('dateListContainer');
             if (container.children.length > 1) entry.remove();
-            else showToast('⚠️ Warning', 'At least one date of meeting is required.', 'warning');
+            else showToast('⚠️ Warning', 'At least one date range is required.', 'warning');
         });
         return entry;
     }
 
-    function addDateEntry(value = '') {
+    function addDateRangeEntry(startValue = '', endValue = '') {
         const container = document.getElementById('dateListContainer');
-        container.appendChild(createDateEntry(value));
+        container.appendChild(createDateRangeEntry(startValue, endValue));
     }
 
-    function getDateValues() {
-        const inputs = document.querySelectorAll('#dateListContainer .date-input');
-        return Array.from(inputs).map(input => input.value).filter(v => v);
+    function getDateRangeValues() {
+        const entries = document.querySelectorAll('#dateListContainer .date-range-entry');
+        const ranges = [];
+        entries.forEach(entry => {
+            const start = entry.querySelector('.date-start').value;
+            const end = entry.querySelector('.date-end').value;
+            if (start || end) {
+                ranges.push({ start: start, end: end });
+            }
+        });
+        return ranges;
     }
 
     function resetDateEntries() {
         const container = document.getElementById('dateListContainer');
         container.innerHTML = '';
         dateCounter = 0;
-        addDateEntry();
+        addDateRangeEntry();
     }
 
     function attachAddDateButtonListener() {
@@ -741,17 +759,14 @@
             newBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                addDateEntry();
-                showToast('📅 Added', 'Another date entry was added. Please select a date.', 'info', 2000);
+                addDateRangeEntry();
+                showToast('📅 Added', 'Another date range entry was added. Please select start and end dates.', 'info', 2000);
             });
         }
     }
 
     // ============================================
     // ✅ FORMAT DATE (always MM/DD/YYYY)
-    // Handles: Date objects, ISO strings, YYYY-MM-DD, MM/DD/YYYY
-    // Uses UTC methods to preserve the intended date (Sheets stores
-    // dates as T16:00:00Z due to UTC+8 offset).
     // ============================================
     function formatDate(dateValue) {
         if (dateValue === null || dateValue === undefined || dateValue === '' || dateValue === '-') return '-';
@@ -798,6 +813,22 @@
         return dateValue;
     }
 
+    // ============================================
+    // ✅ FORMAT DATE RANGE (MM/DD/YYYY - MM/DD/YYYY or single MM/DD/YYYY)
+    // ============================================
+    function formatDateRange(start, end) {
+        const startFormatted = formatDate(start);
+        const endFormatted = formatDate(end);
+        if (startFormatted && endFormatted && startFormatted !== '-' && endFormatted !== '-') {
+            return startFormatted + ' - ' + endFormatted;
+        } else if (startFormatted && startFormatted !== '-') {
+            return startFormatted;
+        } else if (endFormatted && endFormatted !== '-') {
+            return endFormatted;
+        }
+        return '-';
+    }
+
     function escapeHtml(text) {
         if (text === null || text === undefined) return '';
         const div = document.createElement('div');
@@ -809,8 +840,8 @@
     // GET FORM DATA
     // ============================================
     function getFormData() {
-        const dates = getDateValues();
-        const formattedDates = dates.map(d => formatDate(d)).join(', ');
+        const ranges = getDateRangeValues();
+        const formattedDates = ranges.map(r => formatDateRange(r.start, r.end)).filter(s => s !== '-').join(', ');
         return {
             meeting: document.getElementById('meeting').value.trim(),
             agenda: document.getElementById('agenda').value.trim(),
@@ -827,7 +858,7 @@
         const required = ['meeting', 'agenda', 'dateOfMeeting', 'proponents', 'reportingMonth', 'personnelInCharge'];
         for (const field of required) {
             if (!payload[field]) {
-                showToast('❌ Validation Error', 'Please fill in all required fields.', 'error');
+                showToast('❌ Validation Error', 'Please fill in all required fields (including at least one date range).', 'error');
                 return false;
             }
         }
@@ -925,7 +956,7 @@
         }
     }
 
-    // ===== RENDER TABLE (VIEW BUTTON REMOVED) =====
+    // ===== RENDER TABLE =====
     function renderTable(records) {
         if (picNames.length === 0) picNames = ['Juan Dela Cruz', 'Maria Santos', 'Jose Rizal', 'Andres Bonifacio', 'Gabriela Silang'];
 
@@ -998,7 +1029,6 @@
                 html += `<button class="btn-action btn-save-edit" onclick="event.stopPropagation(); saveEditRow(${actualRow})" id="saveBtn_${actualRow}" style="padding:0.1rem 0.4rem; border:none; border-radius:4px; font-size:0.55rem; font-weight:600; cursor:pointer; background:#10b981; color:white; font-family:'Inter',sans-serif;"><i class="fas fa-save"></i><span class="btn-spinner"></span></button>`;
                 html += `<button class="btn-action btn-cancel-edit" onclick="event.stopPropagation(); cancelEditRow()" style="padding:0.1rem 0.4rem; border:none; border-radius:4px; font-size:0.55rem; font-weight:600; cursor:pointer; background:#6b7280; color:white; font-family:'Inter',sans-serif;"><i class="fas fa-times"></i></button>`;
             } else {
-                // ✅ VIEW BUTTON REMOVED — Only Edit & Delete remain
                 html += `<button class="btn-action btn-edit" onclick="event.stopPropagation(); startEditRow(${actualRow})" title="Edit" style="padding:0.1rem 0.4rem; border:none; border-radius:4px; font-size:0.55rem; font-weight:600; cursor:pointer; background:#f59e0b; color:white; font-family:'Inter',sans-serif;"><i class="fas fa-pen"></i></button>`;
                 html += `<button class="btn-action btn-delete" onclick="event.stopPropagation(); deleteRecord(${actualRow})" id="deleteBtn_${actualRow}" title="Delete" style="padding:0.1rem 0.4rem; border:none; border-radius:4px; font-size:0.55rem; font-weight:600; cursor:pointer; background:#ef4444; color:white; font-family:'Inter',sans-serif;"><i class="fas fa-trash"></i><span class="btn-spinner"></span></button>`;
             }
@@ -1028,7 +1058,6 @@
         let linkHtml = '<span class="empty">Not provided</span>';
         if (linkMov && linkMov !== '-' && linkMov !== 'N/A') linkHtml = `<a href="${escapeHtml(linkMov)}" target="_blank"><i class="fas fa-external-link-alt"></i> Open MOV Link</a>`;
 
-        // ✅ No Timestamp item
         const html = `
             <div class="detail-view-header">
                 <h3><i class="fas fa-handshake"></i> ${escapeHtml(meeting)}</h3>
@@ -1039,9 +1068,9 @@
                     <div class="detail-label"><i class="fas fa-list-check"></i> Agenda / Objectives</div>
                     <div class="detail-value ${!record['Agenda / Objectives'] ? 'empty' : ''}">${escapeHtml(record['Agenda / Objectives']) || 'Not provided'}</div>
                 </div>
-                <div class="detail-item">
+                <div class="detail-item full-width">
                     <div class="detail-label"><i class="fas fa-calendar-alt"></i> Date of Meeting</div>
-                    <div class="detail-value ${!record['Date of Meeting'] ? 'empty' : ''}">${escapeHtml(formatDate(record['Date of Meeting'])) || 'Not provided'}</div>
+                    <div class="detail-value ${!record['Date of Meeting'] ? 'empty' : ''}">${escapeHtml(record['Date of Meeting']) || 'Not provided'}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label"><i class="fas fa-users"></i> Proponents</div>
