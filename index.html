@@ -125,6 +125,8 @@
         .btn-test:active { transform: scale(0.97); }
         .btn-view-all { background: #1e3a8a; border: 1px solid #1e3a8a; color: white; }
         .btn-view-all:hover { background: #2563eb; border-color: #2563eb; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3); }
+        .btn-view-chart { background: #8b5cf6; border: 1px solid #8b5cf6; color: white; }
+        .btn-view-chart:hover { background: #7c3aed; border-color: #7c3aed; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
         .btn-sheet { background: #0f9d58; border: 1px solid #0f9d58; color: white; }
         .btn-sheet:hover { background: #0b7e48; border-color: #0b7e48; box-shadow: 0 4px 12px rgba(15, 157, 88, 0.3); }
 
@@ -256,6 +258,21 @@
         .detail-footer .btn-close-detail { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 0.7rem 1.5rem; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-family: "Inter", "Segoe UI", Roboto, sans-serif; }
         .detail-footer .btn-close-detail:hover { background: #e2e8f0; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
 
+        /* ===== CHART MODAL ===== */
+        .chart-modal .modal-box { max-width: 900px; }
+        .chart-modal .modal-body { padding: 1rem 1.5rem 1.5rem; overflow-y: auto; }
+        .chart-filter-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; padding: 0.8rem 0 1.2rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 1rem; }
+        .chart-filter-row .filter-group { display: flex; flex-direction: column; gap: 0.2rem; min-width: 130px; }
+        .chart-filter-row .filter-group label { font-weight: 700; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.4px; color: #475569; }
+        .chart-filter-row select { padding: 0.4rem 0.7rem; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.8rem; outline: none; background: white; font-family: "Inter", sans-serif; }
+        .chart-filter-row select:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15); }
+        .chart-filter-row .btn-apply-chart { background: #8b5cf6; border: none; padding: 0.5rem 1.4rem; border-radius: 30px; color: white; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease; font-family: "Inter", sans-serif; display: inline-flex; align-items: center; gap: 6px; }
+        .chart-filter-row .btn-apply-chart:hover { background: #7c3aed; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
+        .chart-filter-row .btn-apply-chart:active { transform: scale(0.96); }
+        .chart-container-wrapper { position: relative; width: 100%; min-height: 350px; }
+        .chart-container-wrapper canvas { width: 100% !important; height: 350px !important; }
+        .chart-empty-msg { text-align: center; padding: 3rem 1rem; color: #94a3b8; font-size: 0.95rem; }
+
         .editing-row td { background: #fef3c7 !important; }
         .editing-row .action-cell .btn-action { display: none; }
         .editing-row .action-cell .btn-save-edit, .editing-row .action-cell .btn-cancel-edit { display: inline-flex !important; }
@@ -309,6 +326,9 @@
             .detail-view-header { margin: -1rem -1rem 1rem -1rem; padding: 1.2rem 1rem; }
             .detail-footer { flex-direction: column; }
             .detail-footer button { width: 100%; justify-content: center; }
+            .chart-filter-row { flex-direction: column; align-items: stretch; }
+            .chart-filter-row .filter-group { min-width: 100%; }
+            .chart-filter-row .btn-apply-chart { width: 100%; justify-content: center; }
         }
         @media (max-width: 400px) {
             .card { padding: 1rem; }
@@ -442,6 +462,9 @@
         <button type="button" class="btn-test btn-view-all" id="viewAllBtn">
             <i class="fas fa-database"></i> View All Records
         </button>
+        <button type="button" class="btn-test btn-view-chart" id="viewChartBtn">
+            <i class="fas fa-chart-bar"></i> View Chart
+        </button>
         <button type="button" class="btn-test btn-sheet" id="sheetBtn">
             <i class="fas fa-external-link-alt"></i> View Google Sheet
         </button>
@@ -544,6 +567,65 @@
     </div>
 </div>
 
+<!-- ===== CHART MODAL ===== -->
+<div class="modal-overlay chart-modal" id="chartModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2><i class="fas fa-chart-bar"></i> Meetings Attended · Monthly Overview</h2>
+            <button class="close-btn" id="closeChartBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <!-- Chart Filters: Month, Year, Personnel -->
+            <div class="chart-filter-row">
+                <div class="filter-group">
+                    <label for="chartFilterMonth">Month</label>
+                    <select id="chartFilterMonth">
+                        <option value="all">All Months</option>
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="chartFilterYear">Year</label>
+                    <select id="chartFilterYear">
+                        <option value="all">All Years</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="chartFilterPIC">Personnel In-Charge</label>
+                    <select id="chartFilterPIC">
+                        <option value="all">All Personnel</option>
+                    </select>
+                </div>
+                <button class="btn-apply-chart" id="applyChartFilter"><i class="fas fa-chart-simple"></i> Apply Filter</button>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-container-wrapper" id="chartWrapper">
+                <canvas id="meetingsChart"></canvas>
+            </div>
+            <div class="chart-empty-msg" id="chartEmptyMsg" style="display:none;">
+                <i class="fas fa-chart-bar" style="font-size:2rem; opacity:0.5; margin-bottom:0.5rem; display:block;"></i>
+                No data available for the selected filters.
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span class="record-count">📊 Data grouped by <strong>Reporting Month</strong></span>
+            <button class="btn-close-modal" id="closeChartBtn2">Close</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // ============================================
     // TOAST NOTIFICATION SYSTEM
@@ -592,6 +674,7 @@
         }
         populatePicDropdowns();
         updatePICFilters();
+        updateChartPICFilter();
         return picNames;
     }
 
@@ -637,6 +720,22 @@
         }
     }
 
+    // Update chart PIC filter dynamically
+    function updateChartPICFilter() {
+        const chartPIC = document.getElementById('chartFilterPIC');
+        if (!chartPIC) return;
+        const currentValue = chartPIC.value;
+        chartPIC.innerHTML = '<option value="all">All Personnel</option>';
+        picNames.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            chartPIC.appendChild(opt);
+        });
+        if (currentValue && picNames.includes(currentValue)) chartPIC.value = currentValue;
+        else chartPIC.value = 'all';
+    }
+
     // ============================================
     // ADD PERSON MODAL
     // ============================================
@@ -669,6 +768,7 @@
         picNames.push(name);
         populatePicDropdowns();
         updatePICFilters();
+        updateChartPICFilter();
         await savePICNamesToSheet(picNames);
         const targetSelect = document.getElementById('pic');
         if (targetSelect) targetSelect.value = name;
@@ -693,6 +793,7 @@
             picNames.splice(index, 1);
             populatePicDropdowns();
             updatePICFilters();
+            updateChartPICFilter();
             await savePICNamesToSheet(picNames);
             showToast('🗑️ Removed', `"${selectedName}" removed from Personnel In-Charge list.`, 'info');
         }
@@ -766,15 +867,13 @@
     }
 
     // ============================================
-    // ✅ FORMAT DATE (always MM/DD/YYYY)
+    // FORMAT DATE (always MM/DD/YYYY)
     // ============================================
     function formatDate(dateValue) {
         if (dateValue === null || dateValue === undefined || dateValue === '' || dateValue === '-') return '-';
 
-        // Already MM/DD/YYYY
         if (typeof dateValue === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(dateValue)) return dateValue;
 
-        // ISO string with time
         if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(dateValue)) {
             const d = new Date(dateValue);
             if (!isNaN(d.getTime())) {
@@ -785,13 +884,11 @@
             }
         }
 
-        // YYYY-MM-DD
         if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
             const parts = dateValue.split('-');
             return parts[1] + '/' + parts[2] + '/' + parts[0];
         }
 
-        // Date object
         if (dateValue instanceof Date) {
             const month = String(dateValue.getMonth() + 1).padStart(2, '0');
             const day = String(dateValue.getDate()).padStart(2, '0');
@@ -799,7 +896,6 @@
             return month + '/' + day + '/' + year;
         }
 
-        // Fallback
         try {
             const d = new Date(dateValue);
             if (!isNaN(d.getTime())) {
@@ -813,9 +909,6 @@
         return dateValue;
     }
 
-    // ============================================
-    // ✅ FORMAT DATE RANGE (MM/DD/YYYY - MM/DD/YYYY or single MM/DD/YYYY)
-    // ============================================
     function formatDateRange(start, end) {
         const startFormatted = formatDate(start);
         const endFormatted = formatDate(end);
@@ -966,7 +1059,6 @@
             return;
         }
 
-        // ✅ Column order matches backend mapping exactly
         const columns = [
             { key: 'Meeting', label: 'Meeting', cls: 'col-meeting' },
             { key: 'Agenda / Objectives', label: 'Agenda / Objectives', cls: 'col-agenda' },
@@ -994,7 +1086,6 @@
             columns.forEach(col => {
                 let value = record[col.key] || '-';
 
-                // ✅ Format Date of Meeting as MM/DD/YYYY
                 if (col.key === 'Date of Meeting') value = formatDate(value);
 
                 if (isEditing) {
@@ -1221,6 +1312,270 @@
         displayCount.textContent = filtered.length;
         editingRowNumber = null;
     });
+
+    // ============================================
+    // CHART MODAL
+    // ============================================
+    const chartModal = document.getElementById('chartModal');
+    const chartFilterMonth = document.getElementById('chartFilterMonth');
+    const chartFilterYear = document.getElementById('chartFilterYear');
+    const chartFilterPIC = document.getElementById('chartFilterPIC');
+    const applyChartFilter = document.getElementById('applyChartFilter');
+    let meetingsChartInstance = null;
+    let chartRecords = []; // Holds records fetched for chart
+
+    // Fetch records specifically for the chart (independent of records modal)
+    async function fetchChartRecords() {
+        try {
+            const response = await fetch(WEB_APP_URL + '?action=records', { method: 'GET' });
+            const result = await response.json();
+            if (result.result === 'success') {
+                chartRecords = result.records || [];
+            } else {
+                chartRecords = [];
+                showToast('⚠️ Warning', 'Could not load chart data: ' + result.message, 'warning');
+            }
+        } catch (error) {
+            chartRecords = [];
+            showToast('❌ Error', 'Failed to load chart data: ' + error.message, 'error');
+        }
+    }
+
+    async function openChartModal() {
+        chartModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        // Show loading state
+        document.getElementById('chartWrapper').innerHTML = '<div style="text-align:center; padding: 3rem; color:#94a3b8;"><i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i><p style="margin-top:1rem;">Loading chart data...</p></div>';
+        document.getElementById('chartEmptyMsg').style.display = 'none';
+
+        await fetchChartRecords();
+        populateChartYearFilter();
+        renderChart();
+    }
+
+    function closeChartModal() {
+        chartModal.classList.remove('active');
+        if (!recordsModal.classList.contains('active')) document.body.style.overflow = 'auto';
+        if (meetingsChartInstance) { meetingsChartInstance.destroy(); meetingsChartInstance = null; }
+    }
+
+    document.getElementById('closeChartBtn').addEventListener('click', closeChartModal);
+    document.getElementById('closeChartBtn2').addEventListener('click', closeChartModal);
+    chartModal.addEventListener('click', function(e) { if (e.target === chartModal) closeChartModal(); });
+
+    // Populate Year filter based on chart records
+    function populateChartYearFilter() {
+        const yearSelect = document.getElementById('chartFilterYear');
+        const currentValue = yearSelect.value;
+        const yearsSet = new Set();
+        chartRecords.forEach(record => {
+            const dateStr = record['Date of Meeting'] || '';
+            const matches = dateStr.match(/\d{4}/g);
+            if (matches) matches.forEach(y => yearsSet.add(y));
+        });
+        const sortedYears = Array.from(yearsSet).sort();
+        yearSelect.innerHTML = '<option value="all">All Years</option>';
+        sortedYears.forEach(y => {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            yearSelect.appendChild(opt);
+        });
+        if (currentValue && sortedYears.includes(currentValue)) yearSelect.value = currentValue;
+        else yearSelect.value = 'all';
+    }
+
+    // Filter chart records
+    function getFilteredChartRecords() {
+        const monthFilter = chartFilterMonth.value;
+        const yearFilter = chartFilterYear.value;
+        const picFilter = chartFilterPIC.value;
+
+        return chartRecords.filter(record => {
+            if (monthFilter !== 'all') {
+                if ((record['Reporting Month'] || '') !== monthFilter) return false;
+            }
+            if (yearFilter !== 'all') {
+                const dateStr = record['Date of Meeting'] || '';
+                if (!dateStr.includes(yearFilter)) return false;
+            }
+            if (picFilter !== 'all') {
+                if ((record['Personnel In-Charge'] || '') !== picFilter) return false;
+            }
+            return true;
+        });
+    }
+
+       function renderChart() {
+        const records = getFilteredChartRecords();
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const monthCounts = {};
+        monthNames.forEach(m => monthCounts[m] = 0);
+
+        records.forEach(record => {
+            const month = record['Reporting Month'];
+            if (month && monthCounts.hasOwnProperty(month)) {
+                monthCounts[month]++;
+            }
+        });
+
+        const dataValues = monthNames.map(m => monthCounts[m]);
+        const total = dataValues.reduce((a, b) => a + b, 0);
+
+        const wrapper = document.getElementById('chartWrapper');
+        const emptyMsg = document.getElementById('chartEmptyMsg');
+
+        if (meetingsChartInstance) { meetingsChartInstance.destroy(); meetingsChartInstance = null; }
+
+        if (total === 0) {
+            wrapper.innerHTML = ''; // clear canvas
+            wrapper.style.display = 'none';
+            emptyMsg.style.display = 'block';
+            return;
+        } else {
+            wrapper.style.display = 'block';
+            emptyMsg.style.display = 'none';
+            // Re-create canvas if it was removed
+            if (!wrapper.querySelector('canvas')) {
+                wrapper.innerHTML = '<canvas id="meetingsChart"></canvas>';
+            }
+        }
+
+        const ctx = document.getElementById('meetingsChart').getContext('2d');
+
+        // Custom plugin to draw values on top of bars
+        const valueLabelPlugin = {
+            id: 'valueLabel',
+            afterDatasetsDraw(chart) {
+                const { ctx } = chart;
+                const meta = chart.getDatasetMeta(0);
+                if (!meta || !meta.data) return;
+                meta.data.forEach((bar, index) => {
+                    const value = chart.data.datasets[0].data[index];
+                    if (value > 0) {
+                        ctx.save();
+                        ctx.fillStyle = '#1e293b';
+                        ctx.font = '700 11px "Inter", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        ctx.fillText(value, bar.x, bar.y - 4);
+                        ctx.restore();
+                    }
+                });
+            }
+        };
+
+        // Calculate a nice maximum Y value
+        const maxVal = Math.max(...dataValues, 0);
+        let yMax = Math.ceil(maxVal / 5) * 5; // Round up to nearest 5
+        if (yMax === 0) yMax = 5;
+
+        meetingsChartInstance = new Chart(ctx, {
+            type: 'bar',
+            plugins: [valueLabelPlugin],
+            data: {
+                labels: monthNames,
+                datasets: [{
+                    label: 'Number of Meetings',
+                    data: dataValues,
+                    backgroundColor: [
+                        'rgba(37, 99, 235, 0.85)',
+                        'rgba(59, 130, 246, 0.85)',
+                        'rgba(96, 165, 250, 0.85)',
+                        'rgba(16, 185, 129, 0.85)',
+                        'rgba(52, 211, 153, 0.85)',
+                        'rgba(251, 191, 36, 0.85)',
+                        'rgba(245, 158, 11, 0.85)',
+                        'rgba(239, 68, 68, 0.85)',
+                        'rgba(248, 113, 113, 0.85)',
+                        'rgba(139, 92, 246, 0.85)',
+                        'rgba(167, 139, 250, 0.85)',
+                        'rgba(236, 72, 153, 0.85)'
+                    ],
+                    borderColor: [
+                        'rgba(37, 99, 235, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(96, 165, 250, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(52, 211, 153, 1)',
+                        'rgba(251, 191, 36, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(248, 113, 113, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(167, 139, 250, 1)',
+                        'rgba(236, 72, 153, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barPercentage: 0.7,
+                    categoryPercentage: 0.85
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 25 // Space for value labels on top
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleFont: { size: 13, weight: '700', family: 'Inter' },
+                        bodyFont: { size: 12, family: 'Inter' },
+                        padding: 12,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].label;
+                            },
+                            label: function(context) {
+                                return `Total Meetings: ${context.parsed.y}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: yMax,
+                        ticks: {
+                            font: { size: 11, family: 'Inter', weight: '500' },
+                            color: '#64748b',
+                            padding: 8
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.04)',
+                            drawBorder: false,
+                            drawTicks: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: { size: 11, family: 'Inter', weight: '600' },
+                            color: '#334155',
+                            maxRotation: 45,
+                            minRotation: 45,
+                            padding: 8
+                        },
+                        grid: { display: false }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    }
+
+    document.getElementById('viewChartBtn').addEventListener('click', openChartModal);
+    applyChartFilter.addEventListener('click', renderChart);
 
     // ============================================
     // VIEW BUTTONS
